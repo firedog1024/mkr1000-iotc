@@ -1,3 +1,5 @@
+// Super simple morse code LED blinker for Arduino
+
 const char* morseMap [] = {
     ".-",     //a
     "-...",   //b
