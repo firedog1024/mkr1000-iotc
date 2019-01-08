@@ -17,7 +17,7 @@ Arduino MKR1000 or MKR1010 code sample to send temperature and humidity data to 
 
 ## Wiring
 
-![alt text](https://github.com/firedog1024/mkr10x0/raw/master/assets/mkr1000_dht.png "wiring diagram for mkr1000/1010 and DHT11/22")
+![alt text](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/mkr1000_dht.png "wiring diagram for mkr1000/1010 and DHT11/22")
 
 
 ## Configuration
