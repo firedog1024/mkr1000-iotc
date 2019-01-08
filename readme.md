@@ -216,8 +216,13 @@ Sending telemetry ...
 
 Now that we have data being sent lets look at our data in our IoT Central application.  Click the device you created and then select the temperature and humidity telemetry values in the Telemetry column.  You can turn on and off telemetry values by clicking on the eyeballs.  We are only sending temperature and humidity so no other telemetry items will be active.  You should see a screen similar to this:
 
-![wiring diagram for mkr1000/1010 and DHT11/22](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/telemetry.png)
+![telemetry screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/telemetry.png)
 
 The device is also updating the property "Die Number", click on the "Properties" link at the top and you should see the value in the Die Number change about ever 15 seconds.
 
-![wiring diagram for mkr1000/1010 and DHT11/22](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/properties.png)
+![properties screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/properties.png)
+
+We can send a message to the device from IoT Central.  Go to the "Commands" link at the top and enter a message into the Echo - Value to display text box.  The message should consist of only alpha characters (a - z) and spaces, all other characters will be ignored.  Click the "Run" button and watch your device.  You should see the LED blink morse code.  If you enter SOS the led should blink back ...---... where dots are short blinks and dashes slightly longer :-)
+
+![commands screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/commands.png)
+

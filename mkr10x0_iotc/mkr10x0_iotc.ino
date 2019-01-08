@@ -39,6 +39,7 @@
 #include "./sha256.h"
 #include "./base64.h"
 #include "./parson.h"
+#include "./morse_code.h"
 
 #include <SimpleDHT.h>
 
@@ -222,11 +223,25 @@ void handleDirectMethod(String topicStr, String payloadStr) {
     String msgId = topicStr.substring(topicStr.indexOf("$RID=") + 5);
     String methodName = topicStr.substring(topicStr.indexOf(F("$IOTHUB/METHODS/POST/")) + 21, topicStr.indexOf("/?$"));
     Serial_printf((char*)F("Direct method call:\n\tMethod Name: %s\n\tParameters: %s\n"), methodName.c_str(), payloadStr.c_str());
-    String response_topic = (String)IOT_DIRECT_METHOD_RESPONSE_TOPIC;
-    char buff[20];
-    response_topic.replace(F("{request_id}"), msgId);
-    response_topic.replace(F("{status}"), F("200"));  //OK
-    mqtt_client->publish(response_topic.c_str(), "");
+    if (strcmp(methodName.c_str(), "ECHO") == 0) {
+        // acknowledge receipt of the command
+        String response_topic = (String)IOT_DIRECT_METHOD_RESPONSE_TOPIC;
+        char buff[20];
+        response_topic.replace(F("{request_id}"), msgId);
+        response_topic.replace(F("{status}"), F("200"));  //OK
+        mqtt_client->publish(response_topic.c_str(), "");
+
+        // process the command
+        // const char* code = morse_encode("SOS");
+        // Serial.println(code);
+        // morse_flash(code);
+        JSON_Value *root_value = json_parse_string(payloadStr.c_str());
+        JSON_Object *root_obj = json_value_get_object(root_value);
+        const char* msg = json_object_get_string(root_obj, "displayedValue");
+        Serial_printf("msg:%s", msg);
+        morse_encodeAndFlash(msg);
+        json_value_free(root_value);
+    }
 }
 
 void handleCloud2DeviceMessage(String topicStr, String payloadStr) {
