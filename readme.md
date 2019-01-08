@@ -36,14 +36,30 @@ This code requires a couple of libraries to be installed for it to compile.  Dep
 * Install library "Wifi101"
 * Install library "SimpleDHT"
 * Install library "RTCZero"
+* Install library "PubSubClient"
 
 ### MKR1010:
 
 * Install library "WiFiNINA"
 * Install library "SimpleDHT"
 * Install library "RTCZero"
+* Install library "PubSubClient"
 
-To connect the device to Azure IoT Central you will need to provision an IoT Central application.  This is free for **seven days** but if you already have or sign up for an Azure subscription (pay as you go) IoT Central is free as long as you have less than **five devices** and do not exceed **1MB per month** of data.  
+**Note** - We need to increase the payload size limit in PubSubClient to allow for the larger size of MQTT messages from the Azure IoT Hub.  Open the file at %HomePath%\Documents\Arduino\libraries\PubSubClient\src\PubSubClient.h in your favorite code editor.  Change the line (line 26 in current version):
+
+``` C
+#define MQTT_MAX_PACKET_SIZE 128
+```
+
+to:
+
+``` C
+#define MQTT_MAX_PACKET_SIZE 2048
+```
+
+Save the file and you have made the necessary fix.  The size probably does not need to be this large but I have not found the crossover point where the size causes a failure.  Fortunately the MKR1000/1010 has a pretty good sized SRAM so we should be ok.
+
+To connect the device to Azure IoT Central you will need to provision an IoT Central application.  This is free for **seven days** but if you already have or sign up for an Azure subscription (pay as you go) IoT Central is free as long as you have no more than **five devices** and do not exceed **1MB per month** of data.  
 
 Go to https://apps.azureiotcentral.com/ to create an application (you will need to sign in with a Microsoft account identity you may already have one if you use Xbox, office365, Windows 10, or other Microsoft services).  
 
