@@ -231,14 +231,10 @@ void handleDirectMethod(String topicStr, String payloadStr) {
         response_topic.replace(F("{status}"), F("200"));  //OK
         mqtt_client->publish(response_topic.c_str(), "");
 
-        // process the command
-        // const char* code = morse_encode("SOS");
-        // Serial.println(code);
-        // morse_flash(code);
+        // output the message as morse code
         JSON_Value *root_value = json_parse_string(payloadStr.c_str());
         JSON_Object *root_obj = json_value_get_object(root_value);
         const char* msg = json_object_get_string(root_obj, "displayedValue");
-        Serial_printf("msg:%s", msg);
         morse_encodeAndFlash(msg);
         json_value_free(root_value);
     }
