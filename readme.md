@@ -233,8 +233,9 @@ The device is also updating the property "Die Number", click on the "Properties"
 The device will accept settings and acknowledge the receipt of the setting back to IoT Central.  Go to the "Settings" link at the top and change the value for Fan Speed (RPM), then click the "Update" button the text below the input box will briefly turn red then go green when the device acknowledges receipt of the setting.  In the serial monitor the following should be observed:
 
 ```
-{"fanSpeed":{"value":200,"statusCode":200,"status":"completed","desiredVersion":5}}
---> IoT Hub acknowledges successful receipt of twin property: 182
+Fan Speed setting change received with value: 200
+{"fanSpeed":{"value":200,"statusCode":200,"status":"completed","desiredVersion":9}}
+--> IoT Hub acknowledges successful receipt of twin property: 1
 ```
 
 The settings screen should look something like this:

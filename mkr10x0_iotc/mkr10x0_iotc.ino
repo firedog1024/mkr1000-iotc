@@ -206,7 +206,7 @@ void getTime() {
     timeSet = true;
 }
 
-void acknowledgeProperty(const char* propertyKey, const char* propertyValue, int version) {
+void acknowledgeSetting(const char* propertyKey, const char* propertyValue, int version) {
         // for IoT Central need to return acknowledgement
         const static char* PROGMEM responseTemplate = "{\"%s\":{\"value\":%s,\"statusCode\":%d,\"status\":\"%s\",\"desiredVersion\":%d}}";
         char payload[1024];
@@ -257,7 +257,8 @@ void handleTwinPropertyChange(String topicStr, String payloadStr) {
         version = json_object_get_number(root_obj, "$version");
         char propertyValueStr[8];
         itoa(propertyValue, propertyValueStr, 10);
-        acknowledgeProperty(propertyKey, propertyValueStr, version);
+        Serial_printf("Fan Speed setting change received with value: %s\n", propertyValueStr);
+        acknowledgeSetting(propertyKey, propertyValueStr, version);
     }
     json_value_free(root_value);
 }
