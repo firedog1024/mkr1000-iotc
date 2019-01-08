@@ -354,7 +354,6 @@ void readSensors() {
     tempValue = random(0, 7500) / 100.0;
     humidityValue = random(0, 9999) / 100.0;
     #endif
-
 }
 
 void setup() {

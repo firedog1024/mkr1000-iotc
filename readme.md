@@ -9,7 +9,12 @@ Arduino MKR1000 or MKR1010 code sample to send temperature and humidity data to 
 * Works with both the Arduino MKR1000 or MKR1010 devices
 * Uses a DHT11 or DHT22 sensor for temperature and humidity (no sensor no-problem, temperature and humidity data can be simulated)
 * Uses simple MQTT to communicate to Azure IoT Central
-* Simple code base designed to illustrate how the code works and encourage hacking
+* Simple code base designed to illustrate how the code works and encourage hacking (~450 lines w/ comments)
+* IoT Central features supported
+  * Telemetry data - Temperature and Humidity
+  * Properties - device sends a die roll number every 15 seconds
+  * Settings - Change the fan speed value and see it displayed in the serial moitor and acknowledged back to IoT Central
+  * Commands - sned a text message to the device and see it displayed as morse code on the device LED
 
 ## Installation
 
@@ -168,6 +173,7 @@ The code is now running on the device and should be sending data to IoT Central.
 
 We need to update the Wi-Fi firmware on the device to the latest version (19.5.4 for the MKR1000).  Follow the instructions here https://www.arduino.cc/en/Tutorial/FirmwareUpdater to update the firmware to the latest version.  Then start this section from the beginning.
 
+### Telemetry:
 If the device is working correctly you should see output like this in the serial monitor that indicates data is successfully being transmitted to Azure IoT Central:
 
 ```
@@ -218,10 +224,24 @@ Now that we have data being sent lets look at our data in our IoT Central applic
 
 ![telemetry screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/telemetry.png)
 
+### Properties:
 The device is also updating the property "Die Number", click on the "Properties" link at the top and you should see the value in the Die Number change about ever 15 seconds.
 
 ![properties screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/properties.png)
 
+### Settings:
+The device will accept settings and acknowledge the receipt of the setting back to IoT Central.  Go to the "Settings" link at the top and change the value for Fan Speed (RPM), then click the "Update" button the text below the input box will briefly turn red then go green when the device acknowledges receipt of the setting.  In the serial monitor the following should be observed:
+
+```
+{"fanSpeed":{"value":200,"statusCode":200,"status":"completed","desiredVersion":5}}
+--> IoT Hub acknowledges successful receipt of twin property: 182
+```
+
+The settings screen should look something like this:
+
+![settings screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/settings.png)
+
+### Commands:
 We can send a message to the device from IoT Central.  Go to the "Commands" link at the top and enter a message into the Echo - Value to display text box.  The message should consist of only alpha characters (a - z) and spaces, all other characters will be ignored.  Click the "Run" button and watch your device.  You should see the LED blink morse code.  If you enter SOS the led should blink back ...---... where dots are short blinks and dashes slightly longer :-)
 
 ![commands screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/commands.png)
@@ -233,6 +253,8 @@ The morse code blinking LED is here on the MKR1000
 ## What Now
 
 You have the basics now go play and hack this code to send other sensor data to Azure IoT Central.  If you want to create a new device template for this you can learn how to do that with this tutorial https://docs.microsoft.com/en-us/azure/iot-central/howto-set-up-template.
+
+How about creating a rule to alert when the temperature or humidity exceed a certain value.  Learn about creating rules here https://docs.microsoft.com/en-us/azure/iot-central/tutorial-configure-rules.
 
 For general documentation about Azure IoT Central you can go here https://docs.microsoft.com/en-us/azure/iot-central/.
 
