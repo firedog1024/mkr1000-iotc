@@ -228,7 +228,7 @@ We can send a message to the device from IoT Central.  Go to the "Commands" link
 
 The morse code blinking LED is here on the MKR1000
 
-![morse code blinking LED location](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/blinkLED.png)
+![morse code blinking LED location](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/blink_led.png)
 
 ## What Now
 
