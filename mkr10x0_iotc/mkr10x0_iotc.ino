@@ -9,20 +9,25 @@
 #include <time.h>
 #include <SPI.h>
 
+enum mkr_devices {MKR1000, MKR1010};
+
 // are we compiling against the Arduino MKR1000
 #if defined(ARDUINO_SAMD_MKR1000) && !defined(WIFI_101)
 #include <WiFi101.h>
 #define DEVICE_NAME "Arduino MKR1000"
+mkr_devices mkrdevice = MKR1000;
 #endif
 
 // are we compiling against the Arduino MKR1010
 #ifdef ARDUINO_SAMD_MKRWIFI1010
 #include <WiFiNINA.h>
 #define DEVICE_NAME "Arduino MKR1010"
+mkr_devices mkrdevice = MKR1010;
 #endif
 
 #include <WiFiUdp.h>
 #include <RTCZero.h>
+#include <SimpleDHT.h>
 
 /*  You need to go into this file and change this line from:
       #define MQTT_MAX_PACKET_SIZE 128
@@ -40,8 +45,9 @@
 #include "./base64.h"
 #include "./parson.h"
 #include "./morse_code.h"
+#include "./utils.h"
 
-#include <SimpleDHT.h>
+int getHubHostName(char *scopeId, char* deviceId, char* key, char *hostName);
 
 enum dht_type {simulated, dht22, dht11}; 
 
@@ -103,82 +109,7 @@ NTP ntp(wifiUdp);
 // Create an rtc object
 RTCZero rtc;
 
-// convert a float to a string as Arduino lacks an ftoa function
-char *dtostrf(double value, int width, unsigned int precision, char *result)
-{
-    int decpt, sign, reqd, pad;
-    const char *s, *e;
-    char *p;
-    s = fcvt(value, precision, &decpt, &sign);
-    if (precision == 0 && decpt == 0) {
-        s = (*s < '5') ? "0" : "1";
-        reqd = 1;
-    } else {
-        reqd = strlen(s);
-        if (reqd > decpt) reqd++;
-        if (decpt == 0) reqd++;
-    }
-    if (sign) reqd++;
-    p = result;
-    e = p + reqd;
-    pad = width - reqd;
-    if (pad > 0) {
-        e += pad;
-        while (pad-- > 0) *p++ = ' ';
-    }
-    if (sign) *p++ = '-';
-    if (decpt <= 0 && precision > 0) {
-        *p++ = '0';
-        *p++ = '.';
-        e++;
-        while ( decpt < 0 ) {
-            decpt++;
-            *p++ = '0';
-        }
-    }    
-    while (p < e) {
-        *p++ = *s++;
-        if (p == e) break;
-        if (--decpt == 0) *p++ = '.';
-    }
-    if (width < 0) {
-        pad = (reqd + width) * -1;
-        while (pad-- > 0) *p++ = ' ';
-    }
-    *p = 0;
-    return result;
-}
-
-// implementation of printf for use in Arduino sketch
-void Serial_printf(char* fmt, ...) {
-    char buf[256]; // resulting string limited to 128 chars
-    va_list args;
-    va_start (args, fmt );
-    vsnprintf(buf, 256, fmt, args);
-    va_end (args);
-    Serial.print(buf);
-}
-
-// simple URL encoder
-String urlEncode(const char* msg)
-{
-    static const char *hex PROGMEM = "0123456789abcdef";
-    String encodedMsg = "";
-
-    while (*msg!='\0'){
-        if( ('a' <= *msg && *msg <= 'z')
-            || ('A' <= *msg && *msg <= 'Z')
-            || ('0' <= *msg && *msg <= '9') ) {
-            encodedMsg += *msg;
-        } else {
-            encodedMsg += '%';
-            encodedMsg += hex[*msg >> 4];
-            encodedMsg += hex[*msg & 15];
-        }
-        msg++;
-    }
-    return encodedMsg;
-}
+#include "./iotc_dps.h"
 
 // split the Azure IoT Hub connection string into it's component pieces
 void splitConnectionString() {
@@ -358,14 +289,14 @@ void readSensors() {
 
 void setup() {
     Serial.begin(115200);
+
+    // uncomment this line to add a small delay to allow time for connecting serial moitor to get full debug output
+    // delay(5000); 
  
     Serial_printf((char*)F("Hello, starting up the %s device\n"), DEVICE_NAME);
 
     // seed pseudo-random number generator for die roll and simulated sensor values
     randomSeed(millis());
-
-    // get the hostname, deviceId, sharedAccessKey from the connection string
-    splitConnectionString();
 
     // attempt to connect to Wifi network:
     Serial.print((char*)F("WiFi Firmware version is "));
@@ -380,6 +311,17 @@ void setup() {
 
     // get current UTC time
     getTime();
+
+    if (mkrdevice == MKR1000) {
+        // get the hostname, deviceId, sharedAccessKey from the connection string
+        splitConnectionString();
+    } else {
+        deviceId = iotc_deviceId;
+        sharedAccessKey = iotc_deviceKey;
+        char hostName[64] = {0};
+        getHubHostName((char*)iotc_scopeId, (char*)iotc_deviceId, (char*)iotc_deviceKey, hostName);
+        iothubHost = hostName;
+    }
 
     // create SAS token and user name for connecting to MQTT broker
     String url = iothubHost + urlEncode(String((char*)F("/devices/") + deviceId).c_str());
