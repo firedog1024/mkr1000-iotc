@@ -8,13 +8,13 @@ Arduino MKR1000 or MKR1010 code sample to send temperature and humidity data to 
 
 * Works with both the Arduino MKR1000 or MKR1010 devices
 * Uses a DHT11 or DHT22 sensor for temperature and humidity (no sensor no-problem, temperature and humidity data can be simulated)
-* Uses simple MQTT to communicate to Azure IoT Central
+* Uses simple MQTT library to communicate to Azure IoT Central
 * Simple code base designed to illustrate how the code works and encourage hacking (~400 lines of core code w/ comments)
 * IoT Central features supported
   * Telemetry data - Temperature and Humidity
-  * Properties - device sends a die roll number every 15 seconds
+  * Properties - Device sends a die roll number every 15 seconds
   * Settings - Change the fan speed value and see it displayed in the serial moitor and acknowledged back to IoT Central
-  * Commands - sned a text message to the device and see it displayed as morse code on the device LED
+  * Commands - Send a message to the device and see it displayed as morse code on the device LED
 
 ## Installation
 
@@ -57,9 +57,9 @@ to:
 #define MQTT_MAX_PACKET_SIZE 2048
 ```
 
-Save the file and you have made the necessary fix.  The size probably does not need to be this large but I have not found the crossover point where the size causes a failure.  Fortunately the MKR1000/1010 has a pretty good sized SRAM so we should be ok.
+Save the file and you have made the necessary fix.  The size probably does not need to be this large but I have not found the crossover point where the size causes a failure.  Fortunately the MKR1000/1010 has a pretty good amount of SRAM (32KB) so we should be ok.
 
-To connect the device to Azure IoT Central you will need to provision an IoT Central application.  This is free for **seven days** but if you already have or sign up for an Azure subscription (pay as you go) IoT Central is free as long as you have no more than **five devices** and do not exceed **1MB per month** of data.  
+To connect the device to Azure IoT Central you will need to provision an IoT Central application.  This is free for **seven days** but if you already have signed up for an Azure subscription and want to use pay as you go IoT Central is free as long as you have no more than **five devices** and do not exceed **1MB per month** of data.  
 
 Go to https://apps.azureiotcentral.com/ to create an application (you will need to sign in with a Microsoft account identity you may already have one if you use Xbox, office365, Windows 10, or other Microsoft services).  
 
@@ -69,7 +69,7 @@ Go to https://apps.azureiotcentral.com/ to create an application (you will need 
 * If you select Pay-As-You-Go you will need to select your Azure subscription and select a region to install the application into.  This information is not needed for Trial.
 * Click "Create"
 
-You should now have an IoT Central application provisioned so lets add a real device.  Click Device Explorer on the left.  You will now see three templates in the left hand panel (MXChip, Raspberry Pi, Windows 10 IoT Core).  We are going to use the MXChip template for this exercise to prevent having to create a new template.  Click "MXChip" and click the "+" icon on the toolbar, this will present a drop down and we click "Real" to add a new real device.  Give a name to your device and click "Create".  
+You should now have an IoT Central application provisioned so lets add a real device.  Click Device Explorer on the left.  You will now see three templates in the left hand panel (MXChip, Raspberry Pi, Windows 10 IoT Core).  We are going to use the MXChip template for this exercise to prevent having to create a new template.  Click "MXChip" and click the "+V" icon on the toolbar, this will present a drop down where we click "Real" to add a new physical device.  Give a name to your device and click "Create".  
 
 You now have a device in IoT Central that can be connected to from the Arduino MKR1000/1010 device.  Proceed to wiring and configuration.
 
@@ -89,7 +89,7 @@ From left to right pins on the DHT11/22 sensor:
 We need to copy some values from our new IoT Central device into the configure.h file so it can connect to IoT Central.  Currently the process is different for the MKR1000 and the MKR1010 devices but hopefully will be aligned soon.  Lets start with the MKR1010 device.  If you have a MKR1000 device jump to the next section titled MKR1000 configuration.
 
 ### MKR1010 configuration:
-Click the device you created at the end of the Prerequisite step and click the "Connect" link to get the connection information for the device.  We are going to copy "Scope ID', Device ID", and "Primary Key" values into the respective positions in the configure.h
+Click the device you created at the end of the Prerequisite step and click the "Connect" link to get the connection information for the device.  We are going to copy "Scope ID', Device ID", and "Primary Key" values into the respective positions in the configure.h file.
 
 ``` C
 // Azure IoT Central device information
@@ -97,7 +97,7 @@ static char PROGMEM iotc_scopeId[] = "<replace with IoT Central scope-id>";
 static char PROGMEM iotc_deviceId[] = "<replace with IoT Central device id>";
 static char PROGMEM iotc_deviceKey[] = "<replace with IoT Central device key>";
 ```
-Thats it for configuring specifics for the MKR1010, proceed past the MKR1000 configuration section to Common device configuration section.
+Thats it for configuring the MKR1010 specifics, proceed past the MKR1000 configuration section to Common device configuration section.
 
 
 ### MKR1000 configuration:
@@ -106,7 +106,7 @@ Due to current issues using the Azure Device Provisioning Service with this devi
 ```
 git clone https://github.com/Azure/dps-keygen.git
 ```
-in the cloned directory there is a bin folder and inside here three folders for the OS's Windows, OSX, and Linux.  Go into the correct folder for your operating system (for Windows you will need to unzip the .zip file in the folder).  From the command line:
+in the cloned directory there is a bin folder and inside that three folders for the OS's Windows, OSX, and Linux.  Go into the correct folder for your operating system (for Windows you will need to unzip the .zip file in the folder).  Using the command line UX type:
 
 ```
 cd dps-keygen\bin\windows\dps_cstr
@@ -133,7 +133,7 @@ static char PROGMEM iotConnStr[] = "HostName=iotc-fc41f2e1-fc58-40c0-ac56-f7b05c
 
 ### Common device configuration:
 
-For both devices you will also need to provide the Wi-Fi SSID (Wi-Fi name) and password in the configure.h
+For both devices you will need to provide the Wi-Fi SSID (Wi-Fi name) and password in the configure.h
 
 ``` C
 // Wi-Fi information
@@ -141,7 +141,7 @@ static char PROGMEM wifi_ssid[] = "<replace with Wi-Fi SSID>";
 static char PROGMEM wifi_password[] = "<replace with Wi-Fi password>";
 ```
 
-Finally we need to tell the code what DHT sensor we are using.  This can be the DHT22 (white), DHT11 (blue), or none and have the code simulate the values.  Comment and uncomment the appropritae lines in configure.h
+Finally we need to tell the code what DHT sensor we are using.  This can be the DHT22 (white), DHT11 (blue), or none and have the code simulate the values.  Comment and uncomment the appropriate lines in configure.h
 
 ``` C
 // comment / un-comment the correct sensor type being used
@@ -164,7 +164,7 @@ int pinDHT = 2;
 
 Now that you have configured the code with IoT Central, Wi-Fi, and DHT sensor information we are ready to compile and run the code on the device.
 
-Load the mkr10x0_iotc\mkr10x0_iotc.ino file into the Arduino IDE and click the Upload button on the toolbar.  The code should compile and be uplaoded to the device.  In the output window you should see
+Load the mkr10x0_iotc\mkr10x0_iotc.ino file into the Arduino IDE and click the Upload button on the toolbar.  The code should compile and be uploaded to the device.  In the output window you should see:
 
 
 ```
@@ -217,13 +217,13 @@ Verify successful
 done in 0.060 seconds
 CPU reset.
 ```
-The code is now running on the device and should be sending data to IoT Central.  We can look at the serial port monitor by clicking the Tool menu -> Serial Monitor.  You should start to see output displayed in the window.  If you are using a MKR1000 and see the following messages output then there is an issue connecting to the IoT Hub via MQTT due to invalid certificates:
+The code is now running on the device and should be sending data to IoT Central.  We can look at the serial port monitor by clicking the Tool menu -> Serial Monitor (you may need to change the baud rate to 115200).  You should start to see output displayed in the window.  If you are using a MKR1000 and see the following messages output then there is an issue connecting to the IoT Hub via MQTT due to invalid certificates:
 
 ```
 ---> mqtt failed, rc=-2
 ```
 
-We need to update the Wi-Fi firmware on the device to the latest version (19.5.4 for the MKR1000).  Follow the instructions here https://www.arduino.cc/en/Tutorial/FirmwareUpdater to update the firmware to the latest version.  Then start this section from the beginning.
+To fix this we need to update the Wi-Fi firmware on the device to the latest version (19.5.4 for the MKR1000).  Follow the instructions here https://www.arduino.cc/en/Tutorial/FirmwareUpdater to update the firmware to the latest version (currently 19.5.4).  Then start this section from the beginning.
 
 ### Telemetry:
 If the device is working correctly you should see output like this in the serial monitor that indicates data is successfully being transmitted to Azure IoT Central:
@@ -272,7 +272,7 @@ Sending telemetry ...
 	{"temp":   25.20, "humidity":   28.00}
 ```
 
-Now that we have data being sent lets look at our data in our IoT Central application.  Click the device you created and then select the temperature and humidity telemetry values in the Telemetry column.  You can turn on and off telemetry values by clicking on the eyeballs.  We are only sending temperature and humidity so no other telemetry items will be active.  You should see a screen similar to this:
+Now that we have data being sent lets look at the data in our IoT Central application.  Click the device you created and then select the temperature and humidity telemetry values in the Telemetry column.  You can turn on and off telemetry values by clicking on the eyeballs.  We are only sending temperature and humidity so no other telemetry items will be active.  You should see a screen similar to this:
 
 ![telemetry screen shot](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/telemetry.png)
 
@@ -305,7 +305,7 @@ The morse code blinking LED is here on the MKR1000
 
 ## What Now?
 
-You have the basics now go play and hack this code to send other sensor data to Azure IoT Central.  If you want to create a new device template for this you can learn how to do that with this tutorial https://docs.microsoft.com/en-us/azure/iot-central/howto-set-up-template.
+You have the basics now go play and hack this code to send other sensor data to Azure IoT Central.  If you want to create a new device template for this you can learn how to do that with this documentation https://docs.microsoft.com/en-us/azure/iot-central/howto-set-up-template.
 
 How about creating a rule to alert when the temperature or humidity exceed a certain value.  Learn about creating rules here https://docs.microsoft.com/en-us/azure/iot-central/tutorial-configure-rules.
 
