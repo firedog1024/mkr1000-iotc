@@ -318,7 +318,6 @@ void connectMQTT(String deviceId, String username, String password) {
 
 // create an IoT Hub SAS token for authentication
 String createIotHubSASToken(char *key, String url, long expire){
-
     url.toLowerCase();
     String stringToSign = url + "\n" + String(expire);
     int keyLength = strlen(key);
