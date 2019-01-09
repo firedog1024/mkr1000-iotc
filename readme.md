@@ -303,7 +303,7 @@ The morse code blinking LED is here on the MKR1000
 
 ![morse code blinking LED location](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/blink_led.png)
 
-## What Now
+## What Now?
 
 You have the basics now go play and hack this code to send other sensor data to Azure IoT Central.  If you want to create a new device template for this you can learn how to do that with this tutorial https://docs.microsoft.com/en-us/azure/iot-central/howto-set-up-template.
 

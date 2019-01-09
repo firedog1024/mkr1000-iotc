@@ -316,6 +316,7 @@ void setup() {
         // get the hostname, deviceId, sharedAccessKey from the connection string
         splitConnectionString();
     } else {
+        Serial.println("Getting IoT Hub host from Azure IoT DPS");
         deviceId = iotc_deviceId;
         sharedAccessKey = iotc_deviceKey;
         char hostName[64] = {0};
