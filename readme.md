@@ -9,7 +9,7 @@ Arduino MKR1000 or MKR1010 code sample to send temperature and humidity data to 
 * Works with both the Arduino MKR1000 or MKR1010 devices
 * Uses a DHT11 or DHT22 sensor for temperature and humidity (no sensor no-problem, temperature and humidity data can be simulated)
 * Uses simple MQTT to communicate to Azure IoT Central
-* Simple code base designed to illustrate how the code works and encourage hacking (~450 lines w/ comments)
+* Simple code base designed to illustrate how the code works and encourage hacking (~400 lines of core code w/ comments)
 * IoT Central features supported
   * Telemetry data - Temperature and Humidity
   * Properties - device sends a die roll number every 15 seconds
