@@ -4,6 +4,16 @@
 
 Arduino MKR1000 or MKR1010 code sample to send temperature and humidity data to Azure IoT Central.
 
+## Purchasing an Arduino MKR1000 or MKR1010
+
+If you dont have an Arduino MKR1000 or MKR1010 you can purchase one from Arrow 
+
+![Arrow logo](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/arrow-logo.png)
+
+* MKR1000 https://www.arrow.com/en/products/abx00011/arduino-corporation
+* MKR1010 https://www.arrow.com/en/products/abx00023/arduino-corporation
+
+
 ## Features
 
 * Works with both the Arduino MKR1000 or MKR1010 devices
