@@ -10,8 +10,8 @@ If you dont have an Arduino MKR1000 or MKR1010 you can purchase one from Arrow
 
 ![Arrow logo](https://github.com/firedog1024/mkr1000-iotc/raw/master/assets/arrow-logo.png)
 
-* MKR1000 https://www.arrow.com/en/products/abx00011/arduino-corporation
-* MKR1010 https://www.arrow.com/en/products/abx00023/arduino-corporation
+* Arduino MKR1000 https://www.arrow.com/en/products/abx00011/arduino-corporation
+* Arduino MKR1010 https://www.arrow.com/en/products/abx00023/arduino-corporation
 
 
 ## Features
