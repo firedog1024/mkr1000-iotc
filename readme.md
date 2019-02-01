@@ -20,6 +20,7 @@ If you dont have an Arduino MKR1000 or MKR1010 you can purchase one from Arrow
 * Uses a DHT11 or DHT22 sensor for temperature and humidity (no sensor no-problem, temperature and humidity data can be simulated)
 * Uses simple MQTT library to communicate to Azure IoT Central
 * Simple code base designed to illustrate how the code works and encourage hacking (~400 lines of core code w/ comments)
+* Supports the use of Azure IoT Device Provisioning Service (DPS) for registering the device in IoT Central
 * IoT Central features supported
   * Telemetry data - Temperature and Humidity
   * Properties - Device sends a die roll number every 15 seconds
@@ -96,9 +97,8 @@ From left to right pins on the DHT11/22 sensor:
 
 ## Configuration
 
-We need to copy some values from our new IoT Central device into the configure.h file so it can connect to IoT Central.  Currently the process is different for the MKR1000 and the MKR1010 devices but hopefully will be aligned soon.  Lets start with the MKR1010 device.  If you have a MKR1000 device jump to the next section titled MKR1000 configuration.
+We need to copy some values from our new IoT Central device into the configure.h file so it can connect to IoT Central.
 
-### MKR1010 configuration:
 Click the device you created at the end of the Prerequisite step and click the "Connect" link to get the connection information for the device.  We are going to copy "Scope ID', Device ID", and "Primary Key" values into the respective positions in the configure.h file.
 
 ``` C
@@ -107,43 +107,8 @@ static char PROGMEM iotc_scopeId[] = "<replace with IoT Central scope-id>";
 static char PROGMEM iotc_deviceId[] = "<replace with IoT Central device id>";
 static char PROGMEM iotc_deviceKey[] = "<replace with IoT Central device key>";
 ```
-Thats it for configuring the MKR1010 specifics, proceed past the MKR1000 configuration section to Common device configuration section.
 
-
-### MKR1000 configuration:
-Due to current issues using the Azure Device Provisioning Service with this device we need to generate an IoT Hub connection string using an external process.  We have a tool called DPS KeyGen that given device and application information can generate a connection string to the IoT Hub.  Lets grab the tool:
-
-```
-git clone https://github.com/Azure/dps-keygen.git
-```
-in the cloned directory there is a bin folder and inside that three folders for the OS's Windows, OSX, and Linux.  Go into the correct folder for your operating system (for Windows you will need to unzip the .zip file in the folder).  Using the command line UX type:
-
-```
-cd dps-keygen\bin\windows\dps_cstr
-dps_cstr <scope_id> <device_id> <primary_key>
-```
-
-for the values in <> substitute in values taken from clicking the device you created at the end of the Prerequisite step and click the "Connect" link to get the connection information for the device.  We can then copy "Scope ID', Device ID", and "Primary Key" values into the respective positions in the command line.
-
-After executing the command above with the substituted values you should see a connection string displayed on the command line.
-
-```
-.\dps_cstr 0ne0003D8B4 mkr1000 zyGZtz6r5mqta6p7QXOhlxR1ltgHS0quZPgIYiKb9aE=
-...
-Registration Information received from service: iotc-fc41f2e1-fc58-40c0-ac56-f7b05c53f70e.azure-devices.net!
-Connection String:
-HostName=iotc-fc41f2e1-fc58-40c0-ac56-f7b05c53f70e.azure-devices.net;DeviceId=mkr1000;SharedAccessKey=zyGZtz6r5mqta6p7QXOhlxR1ltgHS0quZPgIYiKb9aE=
-```
-
-We need to copy this value from the command line to the configure.h file and paste it into the iotConnStr[] line, the resulting line will look something like this.
-
-``` C
-static char PROGMEM iotConnStr[] = "HostName=iotc-fc41f2e1-fc58-40c0-ac56-f7b05c53f70e.azure-devices.net;DeviceId=mkr1000;SharedAccessKey=zyGZtz6r5mqta6p7QXOhlxR1ltgHS0quZPgIYiKb9aE=";
-```
-
-### Common device configuration:
-
-For both devices you will need to provide the Wi-Fi SSID (Wi-Fi name) and password in the configure.h
+You will also need to provide the Wi-Fi SSID (Wi-Fi name) and password in the configure.h
 
 ``` C
 // Wi-Fi information

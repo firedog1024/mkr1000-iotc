@@ -9,20 +9,16 @@
 #include <time.h>
 #include <SPI.h>
 
-enum mkr_devices {MKR1000, MKR1010};
-
 // are we compiling against the Arduino MKR1000
 #if defined(ARDUINO_SAMD_MKR1000) && !defined(WIFI_101)
 #include <WiFi101.h>
 #define DEVICE_NAME "Arduino MKR1000"
-mkr_devices mkrdevice = MKR1000;
 #endif
 
 // are we compiling against the Arduino MKR1010
 #ifdef ARDUINO_SAMD_MKRWIFI1010
 #include <WiFiNINA.h>
 #define DEVICE_NAME "Arduino MKR1010"
-mkr_devices mkrdevice = MKR1010;
 #endif
 
 #include <WiFiUdp.h>
@@ -111,17 +107,6 @@ RTCZero rtc;
 
 #include "./iotc_dps.h"
 
-// split the Azure IoT Hub connection string into it's component pieces
-void splitConnectionString() {
-    String connStr = (String)iotConnStr;
-    int hostIndex = connStr.indexOf(F("HostName="));
-    int deviceIdIndex = connStr.indexOf(F(";DeviceId="));
-    int sharedAccessKeyIndex = connStr.indexOf(F(";SharedAccessKey="));
-    iothubHost = connStr.substring(hostIndex + 9, deviceIdIndex);
-    deviceId = connStr.substring(deviceIdIndex + 10, sharedAccessKeyIndex);
-    sharedAccessKey = connStr.substring(sharedAccessKeyIndex + 17);
-}
-
 // get the time from NTP and set the real-time clock on the MKR10x0
 void getTime() {
     Serial.println(F("Getting the time from time service: "));
@@ -142,7 +127,7 @@ void acknowledgeSetting(const char* propertyKey, const char* propertyValue, int 
         const static char* PROGMEM responseTemplate = "{\"%s\":{\"value\":%s,\"statusCode\":%d,\"status\":\"%s\",\"desiredVersion\":%d}}";
         char payload[1024];
         sprintf(payload, responseTemplate, propertyKey, propertyValue, 200, F("completed"), version);
-        Serial.println(payload);
+        Serial_printf("Sending acknowledgement: %s\n\n", payload);
         String topic = (String)IOT_TWIN_REPORTED_PROPERTY;
         char buff[20];
         topic.replace(F("{request_id}"), itoa(requestId, buff, 10));
@@ -180,15 +165,28 @@ void handleTwinPropertyChange(String topicStr, String payloadStr) {
     JSON_Value *root_value = json_parse_string(payloadStr.c_str());
     JSON_Object *root_obj = json_value_get_object(root_value);
     const char* propertyKey = json_object_get_name(root_obj, 0);
-    double propertyValue;
+    double propertyValueNum;
+    double propertyValueBool;
     double version;
-    if (strcmp(propertyKey, "fanSpeed") == 0) {
+    if (strcmp(propertyKey, "fanSpeed") == 0 || strcmp(propertyKey, "setVoltage") == 0 || strcmp(propertyKey, "setCurrent") == 0 || strcmp(propertyKey, "activateIR") == 0) {
         JSON_Object* valObj = json_object_get_object(root_obj, propertyKey);
-        propertyValue = json_object_get_number(valObj, "value");
+        if (strcmp(propertyKey, "activateIR") == 0) {
+            propertyValueBool = json_object_get_boolean(valObj, "value");
+        } else {
+            propertyValueNum = json_object_get_number(valObj, "value");
+        }
         version = json_object_get_number(root_obj, "$version");
         char propertyValueStr[8];
-        itoa(propertyValue, propertyValueStr, 10);
-        Serial_printf("Fan Speed setting change received with value: %s\n", propertyValueStr);
+        if (strcmp(propertyKey, "activateIR") == 0) {
+            if (propertyValueBool) {
+                strcpy(propertyValueStr, "true");
+            } else {
+                strcpy(propertyValueStr, "false");
+            }
+        } else {
+            itoa(propertyValueNum, propertyValueStr, 10);
+        }
+        Serial_printf("\n%s setting change received with value: %s\n", propertyKey, propertyValueStr);
         acknowledgeSetting(propertyKey, propertyValueStr, version);
     }
     json_value_free(root_value);
@@ -312,17 +310,12 @@ void setup() {
     // get current UTC time
     getTime();
 
-    if (mkrdevice == MKR1000) {
-        // get the hostname, deviceId, sharedAccessKey from the connection string
-        splitConnectionString();
-    } else {
-        Serial.println("Getting IoT Hub host from Azure IoT DPS");
-        deviceId = iotc_deviceId;
-        sharedAccessKey = iotc_deviceKey;
-        char hostName[64] = {0};
-        getHubHostName((char*)iotc_scopeId, (char*)iotc_deviceId, (char*)iotc_deviceKey, hostName);
-        iothubHost = hostName;
-    }
+    Serial.println("Getting IoT Hub host from Azure IoT DPS");
+    deviceId = iotc_deviceId;
+    sharedAccessKey = iotc_deviceKey;
+    char hostName[64] = {0};
+    getHubHostName((char*)iotc_scopeId, (char*)iotc_deviceId, (char*)iotc_deviceKey, hostName);
+    iothubHost = hostName;
 
     // create SAS token and user name for connecting to MQTT broker
     String url = iothubHost + urlEncode(String((char*)F("/devices/") + deviceId).c_str());
