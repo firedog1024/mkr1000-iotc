@@ -198,7 +198,7 @@ The code is now running on the device and should be sending data to IoT Central.
 ---> mqtt failed, rc=-2
 ```
 
-To fix this we need to update the Wi-Fi firmware on the device to the latest version (19.5.4 for the MKR1000).  Follow the instructions here https://www.arduino.cc/en/Tutorial/FirmwareUpdater to update the firmware to the latest version (currently 19.5.4).  Then start this section from the beginning.
+To fix this we need to update the Wi-Fi firmware on the device to the latest version (19.6.1 for the MKR1000).  Follow the instructions here https://www.arduino.cc/en/Tutorial/FirmwareUpdater to update the firmware to the latest version (currently 19.6.1).  Then start this section from the beginning.
 
 ### Telemetry:
 If the device is working correctly you should see output like this in the serial monitor that indicates data is successfully being transmitted to Azure IoT Central:
