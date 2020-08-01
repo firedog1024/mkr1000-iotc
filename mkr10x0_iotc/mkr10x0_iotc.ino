@@ -21,6 +21,11 @@
 #define DEVICE_NAME "Arduino MKR1010"
 #endif
 
+#ifdef ARDUINO_SAMD_NANO_33_IOT
+  #include <WiFiNINA.h>
+  #define DEVICE_NAME "Arduino Nano 33 IOT"
+#endif
+
 #include <WiFiUdp.h>
 #include <RTCZero.h>
 #include <SimpleDHT.h>
